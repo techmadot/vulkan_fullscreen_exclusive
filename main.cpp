@@ -683,7 +683,13 @@ private:
 
 	VkResult AcquireNextImage(uint32_t* imageIndex)
 	{
-		vkAcquireNextImageKHR(m_vkDevice, m_swapchainContext.swapchain, UINT64_MAX, m_semPresentComplete, VK_NULL_HANDLE, imageIndex);
+		auto res = vkAcquireNextImageKHR(m_vkDevice, m_swapchainContext.swapchain, UINT64_MAX, m_semPresentComplete, VK_NULL_HANDLE, imageIndex);
+		if (res != VK_SUCCESS)
+		{
+			auto str = std::format("vkAcquireNextImageKHR failed. (result = {:d})\n", (int)res);
+			OutputDebugStringA(str.c_str());
+			return res;
+		}
 
 		auto& frame = m_frames[*imageIndex];
 		if (frame.queueSubmitFence != VK_NULL_HANDLE)
